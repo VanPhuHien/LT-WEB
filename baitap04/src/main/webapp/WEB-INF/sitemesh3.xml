@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sitemesh>
+	<!-- để path tuyệt đối đến file decorator -->
+	<mapping path="/*" name="web" decorator="/web.jsp" />
+	<mapping path="/admin/*" name="admin"
+		decorator="/admin.jsp" />
+	<mapping path="/api*" exclude="true" />
+	<!-- exclude uploads, static -->
+	<mapping path="/uploads/*" exclude="true" />
+	<mapping path="/assets/*" exclude="true" />
+</sitemesh>
