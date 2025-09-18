@@ -1,0 +1,35 @@
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout_admin}">
+<div th:fragment="content">
+	<h2>Danh sách danh mục</h2>
+	<a th:href="@{/categories/add}" class="btn btn-success mb-3">Thêm
+		mới</a>
+	<table class="table table-striped" th:if="${!categories.empty}">
+		<thead>
+			<tr>
+				<th>ID</th>
+				<th th:text="#{name}">Tên</th>
+				<th th:text="#{description}">Mô tả</th>
+				<th>Thao tác</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr th:each="category : ${categories.content}">
+				<td th:text="${category.id}"></td>
+				<td th:text="${category.name}"></td>
+				<td th:text="${category.description}"></td>
+				<td><a th:href="@{/categories/edit/{id}(id=${category.id})}"
+					class="btn btn-warning btn-sm">Sửa</a>
+					<form th:action="@{/categories/delete/{id}(id=${category.id})}"
+						method="post" style="display: inline;">
+						<button type="submit" class="btn btn-danger btn-sm"
+							onclick="return confirm('Xóa?')">Xóa</button>
+					</form></td>
+			</tr>
+		</tbody>
+	</table>
+	<p th:if="${categories.empty}" class="alert alert-info">Không có
+		danh mục nào.</p>
+	<a th:href="@{/categories?keyword=}" class="btn btn-info">Tìm kiếm</a>
+</div>

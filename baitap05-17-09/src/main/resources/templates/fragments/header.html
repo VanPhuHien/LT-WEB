@@ -1,0 +1,17 @@
+<div th:fragment="header" class="bg-light p-3 text-center">
+	<div class="container">
+		<img src="/images/anhthe.jpg" alt="Ảnh"
+			class="img-fluid rounded-circle mb-2" style="max-width: 150px;">
+
+		<h1>Chào mừng đến với TMDT</h1>
+
+		<nav class="navbar navbar-expand">
+			<ul class="navbar-nav">
+				<li class="nav-item"><a th:href="@{/categories}"
+					class="nav-link">Xem danh sách</a></li>
+				<li class="nav-item"><a th:href="@{/categories/add}"
+					class="nav-link">Thêm danh mục</a></li>
+			</ul>
+		</nav>
+	</div>
+</div>
