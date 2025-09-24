@@ -1,0 +1,23 @@
+package hien.project.entity;
+
+import java.util.HashSet;
+import java.util.Set;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToMany;
+import lombok.Data;
+
+@Entity
+@Data
+public class Category {
+	@Id
+	@GeneratedValue
+	private Long id;
+	private String name;
+	private String images;
+
+	@ManyToMany(mappedBy = "categories")
+	private Set<User> users = new HashSet<>();
+}
