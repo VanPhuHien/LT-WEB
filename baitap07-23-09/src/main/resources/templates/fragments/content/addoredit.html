@@ -1,0 +1,69 @@
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout_admin}">
+<div th:fragment="content">
+	<h2 th:text="${isEdit} ? 'Sửa danh mục' : ">Thêm danh mục</h2>
+	<form id="categoryForm">
+		<input type="hidden" id="id">
+		<div class="mb-3">
+			<label for="name" class="form-label" th:text="#{name}">Tên</label> <input
+				type="text" id="name" class="form-control"> <span
+				id="nameError" class="text-danger"></span>
+		</div>
+		<div class="mb-3">
+			<label for="description" class="form-label" th:text="#{description}">Mô
+				tả</label>
+			<textarea id="description" class="form-control" rows="3"></textarea>
+		</div>
+		<button type="button" onclick="saveCategory()" class="btn btn-success">Lưu</button>
+		<a th:href="@{/categories}" class="btn btn-secondary">Hủy</a>
+	</form>
+	<div id="error" class="alert alert-danger mt-3" style="display: none">Lỗi</div>
+
+	<script>
+        $(document).ready(function() {
+            var id = new URLSearchParams(window.location.search).get('id');
+            if (id) {
+                loadCategoryForEdit(id);
+            }
+        });
+
+        function loadCategoryForEdit(id) {
+            $.ajax({
+                url: contextPath + '/api/categories/' + id,
+                type: 'GET',
+                dataType: 'json',
+                success: function(category) {
+                    $('#id').val(category.categoryId);
+                    $('#name').val(category.categoryName);
+                    $('#description').val(category.description);
+                },
+                error: function() {
+                    alert('Lỗi tải danh mục');
+                }
+            });
+        }
+
+        function saveCategory() {
+            var category = {
+                categoryId: $('#id').val() || null,
+                categoryName: $('#name').val(),
+                description: $('#description').val()
+            };
+            var url = category.categoryId ? contextPath + '/api/categories/' + category.categoryId : contextPath + '/api/categories';
+            var type = category.categoryId ? 'PUT' : 'POST';
+            $.ajax({
+                url: url,
+                type: type,
+                contentType: 'application/json',
+                data: JSON.stringify(category),
+                success: function() {
+                    window.location.href = contextPath + '/categories';
+                },
+                error: function(xhr) {
+                    $('#error').text(xhr.responseText || 'Lỗi').show();
+                }
+            });
+        }
+    </script>
+</div>

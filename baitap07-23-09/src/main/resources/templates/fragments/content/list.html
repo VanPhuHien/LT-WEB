@@ -1,0 +1,77 @@
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout_admin}">
+<div th:fragment="content">
+	<h2>Danh sách danh mục</h2>
+	<a th:href="@{/categories/add}" class="btn btn-success mb-3">Thêm
+		mới</a>
+	<table class="table table-striped" id="categoryTable">
+		<thead>
+			<tr>
+				<th>ID</th>
+				<th th:text="#{name}">Tên</th>
+				<th th:text="#{description}">Mô tả</th>
+				<th>Thao tác</th>
+			</tr>
+		</thead>
+		<tbody>
+			<!-- AJAX sẽ render ở đây -->
+		</tbody>
+	</table>
+	<p id="emptyMessage" class="alert alert-info" style="display: none">Không
+		có danh mục nào.</p>
+	<a th:href="@{/categories?keyword=}" class="btn btn-info">Tìm kiếm</a>
+
+	<script>
+        $(document).ready(function() {
+            loadCategories();
+        });
+
+        function loadCategories() {
+            $.ajax({
+                url: contextPath + '/api/categories',
+                type: 'GET',
+                dataType: 'json',
+                success: function(data) {
+                    var tbody = $('#categoryTable tbody');
+                    tbody.empty();
+                    if (data.content.length === 0) {
+                        $('#emptyMessage').show();
+                    } else {
+                        $('#emptyMessage').hide();
+                        $.each(data.content, function(i, category) {
+                            var row = '<tr>' +
+                                '<td>' + category.categoryId + '</td>' +
+                                '<td>' + category.categoryName + '</td>' +
+                                '<td>' + (category.description || '') + '</td>' +
+                                '<td>' +
+                                '<a href="' + contextPath + '/categories/edit/' + category.categoryId + '" class="btn btn-warning btn-sm">Sửa</a>' +
+                                '<button onclick="deleteCategory(' + category.categoryId + ')" class="btn btn-danger btn-sm">Xóa</button>' +
+                                '</td>' +
+                                '</tr>';
+                            tbody.append(row);
+                        });
+                    }
+                },
+                error: function() {
+                    alert('Lỗi tải danh sách danh mục');
+                }
+            });
+        }
+
+        function deleteCategory(id) {
+            if (confirm('Xóa?')) {
+                $.ajax({
+                    url: contextPath + '/api/categories/' + id,
+                    type: 'DELETE',
+                    success: function() {
+                        loadCategories();
+                    },
+                    error: function() {
+                        alert('Lỗi xóa danh mục');
+                    }
+                });
+            }
+        }
+    </script>
+</div>

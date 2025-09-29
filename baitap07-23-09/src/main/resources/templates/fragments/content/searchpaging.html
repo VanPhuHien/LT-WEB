@@ -1,0 +1,111 @@
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout_admin}">
+<div th:fragment="content">
+	<h2>Tìm kiếm danh mục</h2>
+	<form id="searchForm" class="mb-3">
+		<div class="input-group">
+			<input type="text" id="keyword" th:value="${keyword}"
+				class="form-control" placeholder="Nhập tên danh mục">
+			<button type="button" onclick="searchCategories()"
+				class="btn btn-primary">Tìm kiếm</button>
+			<a th:href="@{/categories}" class="btn btn-secondary">Danh sách
+				đầy đủ</a>
+		</div>
+	</form>
+	<table class="table table-striped" id="categoryTable">
+		<thead>
+			<tr>
+				<th>ID</th>
+				<th th:text="#{name}">Tên</th>
+				<th th:text="#{description}">Mô tả</th>
+				<th>Thao tác</th>
+			</tr>
+		</thead>
+		<tbody>
+			<!-- AJAX sẽ render ở đây -->
+		</tbody>
+	</table>
+	<p id="emptyMessage" class="alert alert-info" style="display: none">Không
+		tìm thấy kết quả.</p>
+	<nav id="pagingNav" aria-label="Phân trang" style="display: none">
+		<ul class="pagination justify-content-center">
+			<!-- AJAX sẽ render paging -->
+		</ul>
+		<p class="text-muted" id="pagingInfo"></p>
+	</nav>
+
+	<script>
+        $(document).ready(function() {
+            searchCategories();
+        });
+
+        function searchCategories(page = 0) {
+            var keyword = $('#keyword').val();
+            $.ajax({
+                url: contextPath + '/api/categories',
+                type: 'GET',
+                data: {page: page, keyword: keyword},
+                dataType: 'json',
+                success: function(data) {
+                    var tbody = $('#categoryTable tbody');
+                    tbody.empty();
+                    if (data.content.length === 0) {
+                        $('#emptyMessage').show();
+                        $('#pagingNav').hide();
+                    } else {
+                        $('#emptyMessage').hide();
+                        $('#pagingNav').show();
+                        $.each(data.content, function(i, category) {
+                            var row = '<tr>' +
+                                '<td>' + category.categoryId + '</td>' +
+                                '<td>' + category.categoryName + '</td>' +
+                                '<td>' + (category.description || '') + '</td>' +
+                                '<td>' +
+                                '<a href="' + contextPath + '/categories/edit/' + category.categoryId + '" class="btn btn-warning btn-sm">Sửa</a>' +
+                                '<button onclick="deleteCategory(' + category.categoryId + ')" class="btn btn-danger btn-sm">Xóa</button>' +
+                                '</td>' +
+                                '</tr>';
+                            tbody.append(row);
+                        });
+                        renderPaging(data);
+                    }
+                },
+                error: function() {
+                    alert('Lỗi tìm kiếm');
+                }
+            });
+        }
+
+        function renderPaging(data) {
+            var ul = $('#pagingNav ul');
+            ul.empty();
+            if (!data.first) {
+                ul.append('<li class="page-item"><a class="page-link" href="#" onclick="searchCategories(' + (data.number - 1) + ')">Trước</a></li>');
+            }
+            for (var i = 0; i < data.totalPages; i++) {
+                var active = (i == data.number) ? 'active' : '';
+                ul.append('<li class="page-item ' + active + '"><a class="page-link" href="#" onclick="searchCategories(' + i + ')">' + (i + 1) + '</a></li>');
+            }
+            if (!data.last) {
+                ul.append('<li class="page-item"><a class="page-link" href="#" onclick="searchCategories(' + (data.number + 1) + ')">Sau</a></li>');
+            }
+            $('#pagingInfo').text('Trang ' + (data.number + 1) + ' / ' + data.totalPages + ' (Tổng: ' + data.totalElements + ')');
+        }
+
+        function deleteCategory(id) {
+            if (confirm('Xóa?')) {
+                $.ajax({
+                    url: contextPath + '/api/categories/' + id,
+                    type: 'DELETE',
+                    success: function() {
+                        searchCategories();
+                    },
+                    error: function() {
+                        alert('Lỗi xóa danh mục');
+                    }
+                });
+            }
+        }
+    </script>
+</div>
