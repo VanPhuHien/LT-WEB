@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+<title>Index</title>
+</head>
+<body>
+	<h1>Welcome to Product Management</h1>
+	<div sec:authorize="isAuthenticated()">
+		Logged in as: <span sec:authentication="name"></span> Roles: <span
+			sec:authentication="principal.authorities"></span>
+	</div>
+	<div sec:authorize="hasRole('ROLE_ADMIN')">
+		<a th:href="@{/products/new}">Add New Product</a>
+	</div>
+	<table>
+		<thead>
+			<tr>
+				<th>ID</th>
+				<th>Name</th>
+				<th>Price</th>
+				<th>Actions</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr th:each="product : ${products}">
+				<td th:text="${product.id}"></td>
+				<td th:text="${product.name}"></td>
+				<td th:text="${product.price}"></td>
+				<td sec:authorize="hasRole('ROLE_ADMIN')"><a
+					th:href="@{/products/edit/{id}(id=${product.id})}">Edit</a> <a
+					th:href="@{/products/delete/{id}(id=${product.id})}">Delete</a></td>
+			</tr>
+		</tbody>
+	</table>
+	<a th:href="@{/logout}">Logout</a>
+</body>
+</html>
